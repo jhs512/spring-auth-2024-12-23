@@ -9,7 +9,6 @@ import com.ll.auth.global.exceptions.ServiceException;
 import com.ll.auth.global.rsData.RsData;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +46,8 @@ public class ApiV1PostController {
     @DeleteMapping("/{id}")
     public RsData<Void> deleteItem(
             @PathVariable long id,
-            @RequestHeader("actorId") long actorId,
-            @RequestHeader("actorPassword") String actorPassword
+            @RequestHeader long actorId,
+            @RequestHeader String actorPassword
     ) {
         Member actor = memberService.findById(actorId).get();
 
@@ -75,12 +74,7 @@ public class ApiV1PostController {
             String title,
             @NotBlank
             @Length(min = 2)
-            String content,
-            @NotNull
-            Long authorId,
-            @NotNull
-            @Length(min = 4)
-            String password
+            String content
     ) {
     }
 
@@ -88,11 +82,13 @@ public class ApiV1PostController {
     @Transactional
     public RsData<PostDto> modifyItem(
             @PathVariable long id,
-            @RequestBody @Valid PostModifyReqBody reqBody
+            @RequestBody @Valid PostModifyReqBody reqBody,
+            @RequestHeader long actorId,
+            @RequestHeader String actorPassword
     ) {
-        Member actor = memberService.findById(reqBody.authorId).get();
+        Member actor = memberService.findById(actorId).get();
 
-        if (!actor.getPassword().equals(reqBody.password))
+        if (!actor.getPassword().equals(actorPassword))
             throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
 
         Post post = postService.findById(id).get();
@@ -116,22 +112,19 @@ public class ApiV1PostController {
             String title,
             @NotBlank
             @Length(min = 2)
-            String content,
-            @NotNull
-            Long authorId,
-            @NotNull
-            @Length(min = 4)
-            String password
+            String content
     ) {
     }
 
     @PostMapping
     public RsData<PostDto> writeItem(
-            @RequestBody @Valid PostWriteReqBody reqBody
+            @RequestBody @Valid PostWriteReqBody reqBody,
+            @RequestHeader long actorId,
+            @RequestHeader String actorPassword
     ) {
-        Member actor = memberService.findById(reqBody.authorId).get();
+        Member actor = memberService.findById(actorId).get();
 
-        if (!actor.getPassword().equals(reqBody.password))
+        if (!actor.getPassword().equals(actorPassword))
             throw new ServiceException("401-1", "비밀번호가 일치하지 않습니다.");
 
         Post post = postService.write(actor, reqBody.title, reqBody.content);
