@@ -46,9 +46,12 @@ public class ApiV1PostController {
     @DeleteMapping("/{id}")
     public RsData<Void> deleteItem(
             @PathVariable long id,
-            @RequestHeader long actorId,
-            @RequestHeader String actorPassword
+            @RequestHeader String credentials
     ) {
+        String[] credentialsBits = credentials.split("/", 2);
+        long actorId = Long.parseLong(credentialsBits[0]);
+        String actorPassword = credentialsBits[1];
+
         Member actor = memberService.findById(actorId).get();
 
         if (!actor.getPassword().equals(actorPassword))
@@ -83,9 +86,12 @@ public class ApiV1PostController {
     public RsData<PostDto> modifyItem(
             @PathVariable long id,
             @RequestBody @Valid PostModifyReqBody reqBody,
-            @RequestHeader long actorId,
-            @RequestHeader String actorPassword
+            @RequestHeader String credentials
     ) {
+        String[] credentialsBits = credentials.split("/", 2);
+        long actorId = Long.parseLong(credentialsBits[0]);
+        String actorPassword = credentialsBits[1];
+
         Member actor = memberService.findById(actorId).get();
 
         if (!actor.getPassword().equals(actorPassword))
@@ -119,9 +125,12 @@ public class ApiV1PostController {
     @PostMapping
     public RsData<PostDto> writeItem(
             @RequestBody @Valid PostWriteReqBody reqBody,
-            @RequestHeader long actorId,
-            @RequestHeader String actorPassword
+            @RequestHeader String credentials
     ) {
+        String[] credentialsBits = credentials.split("/", 2);
+        long actorId = Long.parseLong(credentialsBits[0]);
+        String actorPassword = credentialsBits[1];
+
         Member actor = memberService.findById(actorId).get();
 
         if (!actor.getPassword().equals(actorPassword))
